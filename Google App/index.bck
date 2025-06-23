@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Books Search</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; }
+    input, button { padding: 8px; margin-right: 5px; }
+    .result { border-bottom: 1px solid #ccc; padding: 10px 0; cursor: pointer; }
+    .description { font-size: 0.9em; color: #444; margin-top: 5px; }
+    .summary { margin: 15px 0; }
+    .pagination button { margin-right: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Google Books Search</h1>
+  <input type="text" id="searchInput" placeholder="Search books...">
+  <button onclick="handleSearch()">Search</button>
+
+  <div class="summary" id="summary"></div>
+  <div id="results"></div>
+  <div class="pagination">
+    <button onclick="changePage(-1)">Previous</button>
+    <button onclick="changePage(1)">Next</button>
+  </div>
+
+  <script>
+    let currentPage = 0;
+    let currentQuery = '';
+    const resultsPerPage = 10;
+
+    async function handleSearch() {
+      currentQuery = document.getElementById('searchInput').value.trim();
+      currentPage = 0;
+      if (currentQuery) {
+        await fetchResults();
+      }
+    }
+
+    async function fetchResults() {
+      const startIndex = currentPage * resultsPerPage;
+      const start = Date.now();
+      const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(currentQuery)}&startIndex=${startIndex}&maxResults=${resultsPerPage}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const time = Date.now() - start;
+
+        const items = data.items || [];
+        const totalItems = data.totalItems || 0;
+
+        const authors = [];
+        const dates = [];
+
+        const resultsDiv = document.getElementById('results');
+        resultsDiv.innerHTML = '';
+
+        items.forEach((item, index) => {
+          const info = item.volumeInfo;
+          const authorList = info.authors || ['Unknown Author'];
+          const title = info.title || 'No Title';
+          const description = info.description || 'No description available.';
+          authors.push(...authorList);
+          if (info.publishedDate) dates.push(info.publishedDate);
+
+          const result = document.createElement('div');
+          result.className = 'result';
+          result.innerHTML = `<strong>${authorList.join(', ')}</strong> - ${title}`;
+          const desc = document.createElement('div');
+          desc.className = 'description';
+          desc.style.display = 'none';
+          desc.textContent = description;
+
+          result.onclick = () => {
+            desc.style.display = desc.style.display === 'none' ? 'block' : 'none';
+          };
+
+          resultsDiv.appendChild(result);
+          resultsDiv.appendChild(desc);
+        });
+
+        const authorFreq = {};
+        authors.forEach(a => authorFreq[a] = (authorFreq[a] || 0) + 1);
+        const topAuthor = Object.entries(authorFreq).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+
+        const validYears = dates
+          .map(d => parseInt(d.slice(0, 4)))
+          .filter(y => !isNaN(y))
+          .sort((a, b) => a - b);
+
+        const summary = document.getElementById('summary');
+        summary.innerHTML = `
+          <p><strong>Total Results:</strong> ${totalItems}</p>
+          <p><strong>Top Author:</strong> ${topAuthor}</p>
+          <p><strong>Oldest Publication:</strong> ${validYears[0] || 'Unknown'}</p>
+          <p><strong>Newest Publication:</strong> ${validYears[validYears.length - 1] || 'Unknown'}</p>
+          <p><strong>Response Time:</strong> ${time} ms</p>
+        `;
+      } catch (err) {
+        alert('Error fetching data');
+        console.error(err);
+      }
+    }
+
+    function changePage(dir) {
+      currentPage = Math.max(0, currentPage + dir);
+      fetchResults();
+    }
+  </script>
+</body>
+</html>
