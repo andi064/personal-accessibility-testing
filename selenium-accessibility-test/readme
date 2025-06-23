@@ -1,0 +1,22 @@
+Selenium Accessibility Test Project
+-----------------------------------
+
+Overview:
+This project uses Selenium WebDriverJS and the Mocha testing framework to automate testing of a web page's main navigation and perform an accessibility scan using the axe-core webdriver integration.
+
+How it is built:
+- JavaScript with Selenium WebDriverJS for browser automation.
+- Mocha as the test runner and Chai for assertions.
+- Accessibility scan integrated with @axe-core/webdriverjs.
+
+Output:
+- Confirms if the main navigation element loads.
+- Runs an accessibility check on the page and logs any violations.
+- Fails tests if accessibility violations are found.
+
+How to test:
+1. Ensure Node.js and npm are installed.
+2. Run `npm install` to install dependencies.
+3. Run the tests with `npx mocha` or `npm test`.
+4. Review console output for test results and accessibility violations.
+5. No output file is created, results can be seen directly on console or cli.
