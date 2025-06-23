@@ -1,0 +1,25 @@
+Google Books Search Web Application
+-----------------------------------
+
+Overview:
+This is a simple web application built with plain HTML, CSS, and JavaScript that allows users to search for 
+books using the Google Books API.
+
+How it is built:
+- Frontend only app using vanilla JavaScript for fetching API data.
+- CSS file for styling.
+- Pagination (10 results per page), expandable book descriptions, and summary statistics 
+(total results, most frequent author, publication date range, response time).
+
+Output:
+- Displays search results formatted as authors - title.
+- Clicking a result expands/collapses its description.
+- Shows summary info above results.
+
+How to test:
+1. Open the `index.html` file in browser.
+2. Enter a search query and click the Search button.
+3. Navigate pages with Previous/Next buttons.
+4. Click on results to toggle descriptions.
+
+Its accessible :)
